@@ -1,34 +1,33 @@
 const xrpl = require("xrpl");
 const fs = require("fs");
 
-async function createTrustLine(receiverWalletSeed) {
+async function setTrustLine() {
   const client = new xrpl.Client("wss://s.altnet.rippletest.net:51233");
   await client.connect();
 
-  // Load receiver wallet
-  const receiverWallet = xrpl.Wallet.fromSeed(receiverWalletSeed);
+  const issuerData = JSON.parse(fs.readFileSync("accounts/issuer.json"));
+  const distData = JSON.parse(fs.readFileSync("accounts/distribution.json"));
 
-  // Prepare trust line transaction
-  const tx = {
+  const issuerAddress = issuerData.address;
+  const distWallet = xrpl.Wallet.fromSeed(distData.seed);
+
+  const trustSetTx = {
     TransactionType: "TrustSet",
-    Account: receiverWallet.classicAddress,
+    Account: distWallet.classicAddress,
     LimitAmount: {
-      currency: "DRIPPY", // The token's ticker
-      issuer: "issuer_wallet_address", // Issuer wallet address
-      value: "1000000", // The amount the wallet is willing to hold
+      currency: "DRIPPY",
+      issuer: issuerAddress,
+      value: "1000000"
     },
-    Flags: 131072, // Trust line flags
+    Flags: xrpl.TrustSetFlags.tfSetNoRipple
   };
 
-  // Autofill the transaction
-  const prepared = await client.autofill(tx);
-
-  // Sign and submit the transaction
-  const signed = receiverWallet.sign(prepared);
+  const prepared = await client.autofill(trustSetTx);
+  const signed = distWallet.sign(prepared);
   const result = await client.submitAndWait(signed.tx_blob);
 
-  console.log("Trust Line Creation Result:", result);
+  console.log("Trust line status:", result.result.meta.TransactionResult);
   await client.disconnect();
 }
 
-// Example: createTrustLine('receiver_wallet_seed_here');
+setTrustLine();

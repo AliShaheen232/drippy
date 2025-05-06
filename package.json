@@ -1,16 +1,19 @@
 {
-    "name": "drippy-token-xrpl",
+    "name": "drippy-token-issuer",
     "version": "1.0.0",
-    "type": "module",
+    "description": "Script to issue the DRIPPY token on XRPL Testnet",
     "main": "index.js",
+    "type": "module",
     "scripts": {
-      "start": "node src/index.js"
+      "start": "node index.js"
     },
     "dependencies": {
-      "xrpl": "^2.7.0",
-      "dotenv": "^16.4.5",
-      "chalk": "^5.3.0",
-      "axios": "^1.6.8"
-    }
+      "dotenv": "^16.3.1",
+      "fs-extra": "^11.2.0",
+      "xrpl": "^2.7.2"
+    },
+    "keywords": ["xrpl", "token", "drippy", "issuer"],
+    "author": "Faher Ali",
+    "license": "MIT"
   }
   
